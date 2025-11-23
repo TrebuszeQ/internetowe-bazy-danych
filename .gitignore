@@ -3,3 +3,4 @@ vscode
 .vscode
 .idea
 __pycache__
+.venv*

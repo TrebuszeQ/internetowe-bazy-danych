@@ -114,6 +114,7 @@ def mysqli_logs_init():
         cursor.close()
         cnx.close()
 
+
 def get_all_users() -> Optional[list]:
     cnx = _get_pydb_connection()
     users_list: list = []
@@ -133,7 +134,6 @@ def get_all_users() -> Optional[list]:
             cursor.close()
             cnx.close()
 
-
         except Exception as e:
             log.warning("Failed to get users: %s", e)
 
@@ -145,6 +145,7 @@ def get_all_users() -> Optional[list]:
                 cnx.close()
 
     return users_list
+
 
 def add_user(username: str, password: str):
     cnx = _get_pydb_connection()

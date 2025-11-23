@@ -15,7 +15,8 @@ def get_users():
 
 @app.route("/users/username/passwod", methods=["POST"])
 def add_user(username: str, password: str):
-    pass
+    data = add_user(username, password)
+    return jsonify(data)
 
 @app.route("/users/<id>")
 def remove_user(user_id: int):

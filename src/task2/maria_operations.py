@@ -13,6 +13,7 @@ _USER: str = "root"
 _DB_PASSWD: str = "dev-instance"
 _DB: str = "python_db"
 
+
 def _get_connection():
     try:
         return mysql.connector.connect(
@@ -25,6 +26,7 @@ def _get_connection():
     except Exception as e:
         log.warning("Failed to connect to %s:%s", _HOST, _PORT)
         return None
+
 
 def _get_pydb_connection():
     try:
@@ -39,6 +41,7 @@ def _get_pydb_connection():
     except Exception as e:
         log.warning("Failed to connect to %s:%s", _HOST, _PORT)
         return None
+
 
 def db_init() -> None:
     """Creates python_db"""

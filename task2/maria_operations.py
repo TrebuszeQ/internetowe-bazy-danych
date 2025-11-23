@@ -123,41 +123,36 @@ def mysqli_logs_init() -> Dict[str, Any]:
     cursor = None
 
     query_dict: Dict[str, str] = {
-        "create_table_query": """
-            CREATE TABLE mysql.mysqli_logs (
-                log_id INT AUTO_INCREMENT PRIMARY KEY,
-                user_id INT,
-                action_type ENUM('INSERT', 'UPDATE', 'DELETE'),
-                action_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );""",
-        "create_triggers_query": """
-            DROP TRIGGER IF EXISTS after_user_insert;
-            CREATE TRIGGER after_user_insert
-            AFTER INSERT ON mysqli_users
-            FOR EACH ROW
-            BEGIN
-                INSERT INTO mysqli_logs (user_id, action_type)
-                VALUES (NEW.id, 'INSERT');
-            END;
-            
-            DROP TRIGGER IF EXISTS after_user_update;
-            CREATE TRIGGER after_user_update
-            AFTER UPDATE ON mysqli_users
-            FOR EACH ROW
-            BEGIN
-                INSERT INTO mysqli_logs (user_id, action_type)
-                VALUES (NEW.id, 'UPDATE');
-            END;
+        "create_db_query": "CREATE DATABASE python_db;",
+        "create_table_query": """CREATE TABLE mysqli_logs (
+            log_id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT,
+            action_type ENUM('INSERT', 'UPDATE', 'DELETE'),
+            action_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );""",
+        "create_triggers_query": """CREATE TRIGGER after_user_insert
+        AFTER INSERT ON mysqli_users
+        FOR EACH ROW
+        BEGIN
+            INSERT INTO mysqli_logs (user_id, action_type)
+            VALUES (NEW.id, 'INSERT');
+        END;
 
-            DROP TRIGGER IF EXISTS after_user_delete;
-            CREATE TRIGGER after_user_delete
-            AFTER DELETE ON mysqli_users
-            FOR EACH ROW
-            BEGIN
-                INSERT INTO mysqli_logs (user_id, action_type)
-                VALUES (OLD.id, 'DELETE');
-            END;
-        """
+        CREATE TRIGGER after_user_update
+        AFTER UPDATE ON mysqli_users
+        FOR EACH ROW
+        BEGIN
+            INSERT INTO mysqli_logs (user_id, action_type)
+            VALUES (NEW.id, 'UPDATE');
+        END;
+
+        CREATE TRIGGER after_user_delete
+        AFTER DELETE ON mysqli_users
+        FOR EACH ROW
+        BEGIN
+            INSERT INTO mysqli_logs (user_id, action_type)
+            VALUES (OLD.id, 'DELETE');
+        END;"""
     }
 
     try:

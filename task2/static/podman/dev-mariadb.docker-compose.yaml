@@ -4,7 +4,9 @@ services:
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: dev-instance
-  
+    ports:
+      - 3306:3306
+
   adminer:
     image: adminer
     restart: always

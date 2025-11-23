@@ -124,7 +124,7 @@ def mysqli_logs_init() -> Dict[str, Any]:
 
     query_dict: Dict[str, str] = {
         "create_table_query": """
-            CREATE TABLE mysqli_logs (
+            CREATE TABLE mysql.mysqli_logs (
                 log_id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT,
                 action_type ENUM('INSERT', 'UPDATE', 'DELETE'),
@@ -298,7 +298,6 @@ def delete_user(username: str, host: str = 'localhost') -> Dict[str, Any]:
     Args:
         username (str): The username to delete.
         host (str): The host associated with the user (e.g., 'localhost', '%').
-
     Returns:
         Dict[str, Any]: A structured response dictionary.
     """
@@ -330,6 +329,61 @@ def delete_user(username: str, host: str = 'localhost') -> Dict[str, Any]:
 
     except Exception as e:
         msg: str = f"Failed to delete user {username}@{host}: {e}"
+        response["success"] = False
+        response["message"] = msg
+        log.warning(msg)
+
+        if cnx:
+            cnx.rollback()
+
+    finally:
+        if cursor:
+            cursor.close()
+        if cnx:
+            cnx.close()
+
+    return response
+
+
+def delete_user_by_id(user_id: int) -> Dict[str, Any]:
+    """
+    Deletes a user account from the database using the DROP USER command.
+    Host defaults to 'localhost' but can be specified.
+
+    Args:
+        user_id (id): User id in the table.
+    Returns:
+        Dict[str, Any]: A structured response dictionary.
+    """
+    result = _get_pydb_connection()
+    host = "localhost"
+
+    if result is None:
+        return {"success": False, "message": "Database connection failed."}
+
+    cnx, response = result
+
+    if not user_id:
+        response["success"] = False
+        response["message"] = "Missing required field: username."
+        return response
+
+    cursor = None
+    try:
+        cursor = cnx.cursor()
+
+        query = "DROP USER IF EXISTS %s@%s;"
+
+        cursor.execute(query, (user_id, host))
+
+        cnx.commit()
+
+        log.info("Attempted to delete user %s@%s", user_id, host)
+        response["success"] = True
+        response["message"] = f"Attempted to delete user {user_id}@{host}."
+
+    except Exception as e:
+        msg: str = f"Failed to delete user {user_id}@{host}: {e}"
         response["success"] = False
         response["message"] = msg
         log.warning(msg)
